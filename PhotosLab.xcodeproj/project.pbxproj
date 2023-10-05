@@ -13,6 +13,8 @@
 		ECBB280F2ACF21E400368F0C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECBB280E2ACF21E400368F0C /* ContentView.swift */; };
 		ECBB28112ACF21E600368F0C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ECBB28102ACF21E600368F0C /* Assets.xcassets */; };
 		ECBB28152ACF21E600368F0C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ECBB28142ACF21E600368F0C /* Preview Assets.xcassets */; };
+		ECBB281C2ACF223F00368F0C /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECBB281B2ACF223F00368F0C /* NetworkMonitor.swift */; };
+		ECBB281E2ACF29F900368F0C /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECBB281D2ACF29F900368F0C /* ImagePicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		ECBB28102ACF21E600368F0C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ECBB28122ACF21E600368F0C /* PhotosLab.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PhotosLab.entitlements; sourceTree = "<group>"; };
 		ECBB28142ACF21E600368F0C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		ECBB281B2ACF223F00368F0C /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		ECBB281D2ACF29F900368F0C /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +67,8 @@
 				ECBB28122ACF21E600368F0C /* PhotosLab.entitlements */,
 				ECBB280B2ACF21E400368F0C /* PhotosLab.xcdatamodeld */,
 				ECBB28132ACF21E600368F0C /* Preview Content */,
+				ECBB281B2ACF223F00368F0C /* NetworkMonitor.swift */,
+				ECBB281D2ACF29F900368F0C /* ImagePicker.swift */,
 			);
 			path = PhotosLab;
 			sourceTree = "<group>";
@@ -147,6 +153,8 @@
 			files = (
 				ECBB28082ACF21E400368F0C /* PhotosLabApp.swift in Sources */,
 				ECBB280A2ACF21E400368F0C /* Persistence.swift in Sources */,
+				ECBB281C2ACF223F00368F0C /* NetworkMonitor.swift in Sources */,
+				ECBB281E2ACF29F900368F0C /* ImagePicker.swift in Sources */,
 				ECBB280F2ACF21E400368F0C /* ContentView.swift in Sources */,
 				ECBB280D2ACF21E400368F0C /* PhotosLab.xcdatamodeld in Sources */,
 			);

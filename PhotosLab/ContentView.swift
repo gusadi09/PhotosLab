@@ -10,50 +10,78 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var networkMonitor: NetworkMonitor
+    
+    @State var isShowImagePicker = false
+    @State var image: UIImage? = nil
 
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Photo.photoId, ascending: true)],
         animation: .default)
-    private var items: FetchedResults<Item>
+    private var items: FetchedResults<Photo>
 
     var body: some View {
         NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+            if networkMonitor.isConnected {
+                List {
+                    ForEach(items) { item in
+                        NavigationLink {
+                            retrieveImage(with: item.photoId ?? "")
+                        } label: {
+                            Text(item.photoId ?? "")
+                        }
                     }
+                    .onDelete(perform: deleteItems)
                 }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
+                .toolbar {
 #if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        EditButton()
+                    }
 #endif
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    ToolbarItem {
+                        Button(action: {
+                            isShowImagePicker.toggle()
+                            
+                        }) {
+                            Label("Add Item", systemImage: "plus")
+                        }
                     }
                 }
+                .sheet(isPresented: $isShowImagePicker, content: {
+                    ImagePicker(takenPicture: $image)
+                })
+                .onChange(of: image) { oldValue, newValue in
+                    if networkMonitor.isConnected {
+                        // Add to firebase function
+                    } else {
+                        saveToDocumentDirectory(image: image, imageId: "\(items.count+1)")
+                        addItem(id: "\(items.count+1)")
+                    }
+                }
+                .onChange(of: networkMonitor.isConnected) { oldValue, newValue in
+                    if newValue {
+                        // Add to firebase function
+                    } else {
+                        saveToDocumentDirectory(image: image, imageId: "\(items.count+1)")
+                        addItem(id: "\(items.count+1)")
+                    }
+                }
+            } else {
+                
+                Text("Offline")
             }
-            Text("Select an item")
         }
     }
 
-    private func addItem() {
+    private func addItem(id: String) {
         withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
+            let newItem = Photo(context: viewContext)
+            newItem.photoId = id
 
             do {
                 try viewContext.save()
             } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
@@ -63,26 +91,49 @@ struct ContentView: View {
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             offsets.map { items[$0] }.forEach(viewContext.delete)
-
+            
             do {
                 try viewContext.save()
             } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
         }
     }
+    
+    func getDocumentsDirectory() throws -> URL {
+         return try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+    }
+    
+    func saveToDocumentDirectory(image: UIImage?, imageId: String) {
+        if let image = image, let data = image.jpegData(compressionQuality: 0.7) {
+            do {
+                let filename = try getDocumentsDirectory().appendingPathComponent(imageId)
+                try data.write(to: filename, options: [[.atomicWrite, .completeFileProtection]])
+            } catch {
+                print("error saving data")
+            }
+        }
+    }
+    
+    func retrieveImage(with id: String) -> Image {
+        let dummyImage = Image(systemName: "person")
+        do {
+            let filename =  try getDocumentsDirectory().appendingPathComponent(id)
+            let data = try Data(contentsOf: filename)
+            if let uiImage = UIImage(data: data) {
+                return Image(uiImage: uiImage)
+            }
+        } catch {
+            print("error loading data")
+            return dummyImage
+        }
+        
+        return dummyImage
+    }
 }
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
 
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        .environmentObject(NetworkMonitor())
 }
